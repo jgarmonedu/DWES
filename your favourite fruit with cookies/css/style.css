@@ -1,0 +1,47 @@
+/* 
+   CSS ejemplo cookie idioma
+   26 de octubre de 2020
+   DWES 2º DAW
+   IES Virgen del Carmen de Jaén
+*/
+
+body { 
+  /*background-color: #CCFF99; */
+  font-family: sans-serif; 
+  padding: 0 20px;
+}
+
+h1 { 
+  margin: 20px;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+footer {
+  clear: both;
+  border-top: black solid 1px;
+  margin-top: 2em;
+  padding-top: 5px; 
+}
+
+footer cite {
+  font-weight: bold;
+}
+
+/* Tamaño de la imagen incluida en párrafo de la Clase bandera  */
+
+p.fruta img {
+  width: 200px;
+  height: 200px;  
+}
+
+/* Texto del mensaje */
+#mensaje {
+    font-family: monospace;
+	color: #CC0000;
+    font-size: 2em;
+}
+
+p.licencia { 
+  text-align: left;
+}

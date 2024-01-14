@@ -1,0 +1,75 @@
+h1, h3 {
+
+    margin-top: 15px;
+    text-align: center;
+
+}
+
+tbody tr:nth-child(odd) {
+    background-color: #e6f6fe;
+}
+
+footer {
+    background-color: #235075;
+    color: white;
+    height: 90px;
+    margin-top: 20px;
+    text-align: center;
+    padding: 15px;
+}
+
+#info {
+
+    border-bottom: 1px solid #1EAEDB;
+    border-top: 1px solid #1EAEDB;
+
+    border-radius: 3px;
+
+    padding: 10px;
+
+    margin-bottom: 10px;
+}
+
+#order {
+
+    text-align: center;
+
+}
+
+.center {
+    text-align: center  ;
+}
+
+.page {
+
+    text-align: center;
+
+}
+
+.new {
+    text-align: center;
+}
+
+.success {
+    color: limegreen;
+}
+
+.error {
+    color: red;
+}
+
+.button-danger {
+
+    color: #FFF !important;
+    background-color: #db1e1e !important;
+    border-color: #db1e1e !important;
+
+}
+
+.button-danger:hover {
+
+    color: #FFF !important;
+    background-color: #c11919 !important;
+    border-color: #c11919 !important;
+
+}

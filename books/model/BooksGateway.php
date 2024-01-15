@@ -7,7 +7,7 @@ class BooksGateway extends Database
     public function selectAll($order, $type,$startpage)
     {
         $pdo = Database::connect();
-        $query = "SELECT * FROM Books ORDER BY $order $type limit $startpage , ". ITEMS_BY_PAGE;
+        $query = "SELECT * FROM books ORDER BY $order $type limit $startpage , ". ITEMS_BY_PAGE;
         $sql = $pdo->prepare($query);
         $sql->execute();
         // $result = $sql->fetchAll(PDO::FETCH_ASSOC);
@@ -22,7 +22,7 @@ class BooksGateway extends Database
     public function selectById($id)
     {
         $pdo = Database::connect();
-        $sql = $pdo->prepare("SELECT * FROM Books WHERE id = ?");
+        $sql = $pdo->prepare("SELECT * FROM books WHERE id = ?");
         $sql->bindValue(1, $id);
         $sql->execute();
         $result = $sql->fetch(PDO::FETCH_OBJ);
@@ -33,21 +33,21 @@ class BooksGateway extends Database
     public function insert($isbn, $title, $author, $publisher, $pages)
     {
         $pdo = Database::connect();
-        $sql = $pdo->prepare("INSERT INTO Books (isbn, title, author, publisher, pages) VALUES (?, ?, ?, ?, ?)");
+        $sql = $pdo->prepare("INSERT INTO books (isbn, title, author, publisher, pages) VALUES (?, ?, ?, ?, ?)");
         $result = $sql->execute(array($isbn, $title, $author, $publisher, $pages));
     }
 
     public function edit($isbn, $title, $author, $publisher, $pages, $id)
     {
         $pdo = Database::connect();
-        $sql = $pdo->prepare("UPDATE Books set isbn = ?, title = ?, author = ?, publisher = ?, pages = ? WHERE id = ? LIMIT 1");
+        $sql = $pdo->prepare("UPDATE books set isbn = ?, title = ?, author = ?, publisher = ?, pages = ? WHERE id = ? LIMIT 1");
         $result = $sql->execute(array($isbn, $title, $author, $publisher, $pages, $id));
     }
 
     public function delete($id)
     {
         $pdo = Database::connect();
-        $sql = $pdo->prepare("DELETE FROM Books WHERE id = ?");
+        $sql = $pdo->prepare("DELETE FROM books WHERE id = ?");
         $sql->execute(array($id));
     }
 
@@ -64,7 +64,7 @@ class BooksGateway extends Database
 
     public function countBooks(){
         $pdo = Database::connect();
-        $res = $pdo->query("SELECT COUNT(*) FROM Books")->fetchColumn();
+        $res = $pdo->query("SELECT COUNT(*) FROM books")->fetchColumn();
         return $res;
     }
 

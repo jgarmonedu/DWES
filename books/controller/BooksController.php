@@ -80,7 +80,7 @@ class BooksController
             $pdf->Output();
         } else {
             $books = $this->booksService->getAllBooks($orderby,$orderoption,$startpage);
-            include ROOT_PATH . '/view/Books.php';
+            include ROOT_PATH . '/view/books.php';
         }
     }
 

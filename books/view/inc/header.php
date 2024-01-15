@@ -4,6 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title><?= TITLE; ?></title>
     <meta name="author" content="<?= AUTHOR ?>">
+    <link rel='icon' type='image/png' href='public/images/favicon.png'>
     <link rel="stylesheet" href="public/css/normalize.css">
     <link rel="stylesheet" href="public/css/skeleton.css">
     <link rel="stylesheet" href="public/css/styles.css">

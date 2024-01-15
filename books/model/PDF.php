@@ -33,7 +33,7 @@ class PDF extends PdfTable
 
     function ShowTable($order, $type, $limit) {
         $pdo = Database::connect();
-        $query = "SELECT isbn, Title, Author, Publisher FROM Books ORDER BY ". $order." " . $type. " LIMIT ". $limit;
+        $query = "SELECT isbn, title, author, publisher FROM books ORDER BY ". $order." " . $type. " LIMIT ". $limit;
         return $this->Table($pdo,$query);
        
     }

@@ -8,19 +8,23 @@ Develop a PHP web page that consumes the authenticated SOAP server from the "Aut
 
 Authetication (*service-automobiles-auth.php*)
 
-```php
- public function authenticate($header_params) {
-        if ($header_params->username == 'ies' && $header_params->password == 'daw') {
-            $this->IsAuthenticated = true;
-            return true;
-        } else {
-            throw new SoapFault('Wrong user/pass combination', 401);
-        }
-    }
+```php (class ManageAutomobilesAuth)
+
+public function authenticate($header_params)
+public function getBrandById($id)
+public function getBrandsUrl()
+public function getModelsByBrand($brand)
+
 ```
 
-## Client Side
+## Client Side (class Client)
 
-### Folder multibrand
+```php
+public function getBrandById($brand)
+public function getBrandsUrl()
+public function getModelsByBrand($brand
 
-Structure 
+```
+
+### Folder multibrand [Structure]
+![alt structure] (structure.png]

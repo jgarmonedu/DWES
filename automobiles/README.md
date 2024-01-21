@@ -21,6 +21,5 @@ Authetication (*service-automobiles-auth.php*)
 
 ## Client Side
 
-### Folder multibrand
-
-Structure 
+### Folder multibrand [Structure]
+![alt structure] (structure.png]

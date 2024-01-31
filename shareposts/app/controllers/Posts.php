@@ -132,7 +132,7 @@
       $this->view('posts/show', $data);
     }
 
-    public function delete($id){
+    public function delete($id, $_SESSION['user_id']){
       if($_SERVER['REQUEST_METHOD'] == 'POST'){
         // Get existing post from model
         $post = $this->postModel->getPostById($id);

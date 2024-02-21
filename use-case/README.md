@@ -4,6 +4,15 @@
 Loading content to suscription throw WebSockets with Pusher
 Is necessary to put the **personal API Key** information.
 
+`$pusher = new Pusher\Pusher(
+    "API_KEY", // Replace with 'key' from dashboard
+    "SECRET", // Replace with 'secret' from dashboard
+    "APP_ID", // Replace with 'app_id' from dashboard
+    array(
+        'cluster' => 'CLUSTER' // Replace with 'cluster' from dashboard
+    )
+);`
+
 File **population.php** add data to pusher subscription and **index.html** receives from subscription tha data updated.
 
 More information [Pusher WebSocket](https://pusher.com/websockets/)

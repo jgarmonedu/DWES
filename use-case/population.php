@@ -14,8 +14,7 @@ $pusher = new Pusher\Pusher(
 // you should trigger the event based on real-world changes!
 // Set data
 while (true) {
-    $pusher->trigger('population', 'new-population', array(
-        [
+    $pusher->trigger('population', 'new-population', array([
             "country" => "USA",
             "value" => 2025 + rand(-200,200)
         ],[ "country"=> "China",

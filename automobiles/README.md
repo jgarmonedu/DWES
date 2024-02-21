@@ -27,4 +27,5 @@ public function getModelsByBrand($brand
 ```
 
 ### Folder multibrand [Structure]
-![alt structure] (structure.png]
+
+![Alt structure](structure.png)

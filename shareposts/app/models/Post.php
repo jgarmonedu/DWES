@@ -63,13 +63,18 @@
     }
 
     public function deletePost($id){
-      $this->db->query('DELETE FROM posts WHERE id = :id');
+      $this->db->query('DELETE FROM posts WHERE id = :id AND user_id = :user_id');
       // Bind values
+
       $this->db->bind(':id', $id);
+      $this->db->bind(':user_id', $user_id);
 
       // Execute
       if($this->db->execute()){
-        return true;
+          if ($this->db->rowCount()==1)  // Check whether delete is commit
+              return true;
+          else
+              return false;
       } else {
         return false;
       }

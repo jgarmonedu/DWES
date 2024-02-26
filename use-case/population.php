@@ -3,7 +3,7 @@
 require __DIR__ . '/vendor/autoload.php';
 
 $pusher = new Pusher\Pusher(
-    "API_KEY", // Replace with 'key' from dashboard
+    "APP_KEY", // Replace with 'key' from dashboard
     "SECRET", // Replace with 'secret' from dashboard
     "APP_ID", // Replace with 'app_id' from dashboard
     array(
@@ -13,7 +13,8 @@ $pusher = new Pusher\Pusher(
 // Trigger a new random event every second. In your application,
 // you should trigger the event based on real-world changes!
 // Set data
-while (true) {
+//while (true) {
+for ($i = 0; $i < 10; $i++) {
     $pusher->trigger('population', 'new-population', array([
             "country" => "USA",
             "value" => 2025 + rand(-200,200)
@@ -39,6 +40,6 @@ while (true) {
             "value"=> 441 + rand(-200,200)
         ]
     ));
-    sleep(1);
+    sleep(10);
 }
 

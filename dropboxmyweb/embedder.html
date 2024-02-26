@@ -1,0 +1,51 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dropbox Pre-built components</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="lz99fw3db1pfy1n"></script>
+    <style>
+        #container {
+            height: 600px;
+        }
+    </style>
+</head>
+<body>
+<section class="section">
+    <div class="container">
+        <h1 class="title has-text-primary">Dropbox Pre-built components</h1>
+
+        <div class="tile is-ancestor">
+            <div class="tile is-parent">
+                <article class="tile is-child box">
+                    <h2 class="title"><a href="https://www.dropbox.com/developers/embedder">Embedder</a></h2>
+                    <p class="subtitle">The Embedder allows you to use shared links to embed previews of Dropbox files
+                        or folders inside your web app.</p>
+                    <div id="container"></div>
+                </article>
+            </div>
+
+        </div>
+    </div>
+</section>
+<script>
+    var options = {
+        // Shared link to Dropbox file
+        link: "https://www.dropbox.com/scl/fo/xfk5xywnaj8xuls4o3d7j/h?rlkey=0c3xcmoreo5znt48xu8w4k0ql&dl=0",
+        file: {
+            // Sets the zoom mode for embedded files. Defaults to 'best'.
+            zoom: "best" // "best" or "fit"
+        },
+        folder: {
+            // Sets the view mode for embedded folders. Defaults to 'list'.
+            view: "list", // "grid" or "list"
+            headerSize: "small" // or "normal"
+        }
+    }
+    let element = document.getElementById('container');
+    Dropbox.embed(options, element);
+</script>
+</body>
+</html>

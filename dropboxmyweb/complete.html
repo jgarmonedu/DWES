@@ -1,0 +1,335 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dropbox Pre-built components</title>
+    <!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">-->
+    <script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="lz99fw3db1pfy1n"></script>
+    <script rel="preconnect" src="https://cdn.tailwindcss.com"></script>
+
+    <!-- font awesome -->
+    <script src="https://kit.fontawesome.com/ffbd6d2f88.js" crossorigin="anonymous"  defer></script>
+    <style>
+        #container {
+            height: 800px;
+        }
+
+        #saver {
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+<section class="section">
+    <div class="container mx-auto">
+        <h1 class="text-4xl text-teal-400 py-8 font-semibold">Dropbox Pre-built components</h1>
+        <div class="box-border shadow-md p-4">
+            <article>
+                <h2 class="text-3xl text-blue-400 px-2 font-semibold"><a href="https://www.dropbox.com/developers/embedder">Upload files to DropBox</a></h2>
+                <p class="text-xl p-3">The Upload options allows you to use save file into Dropbox previews view of Dropbox files
+                    or folders inside your web app.</p>
+             <!-- Documents uploads form and instructions -->
+                <section class="mt-5 px-3 flex gap-6">
+                    <div class="flex-1 flex flex-col items-center p-3 border-2 border-dotted border-gray-300 rounded-lg drag-area">
+                        <i class="fa-sharp fa-solid fa-cloud-arrow-up text-8xl text-blue-400"></i>
+                        <header class="mt-8">
+                            <span class="drag-file">Drag files here to upload </span> or
+                            <button class="px-2 py-1 text-white bg-blue-400 rounded-lg file-input-button">
+                                select a file
+                            </button>
+                            from your device
+                        </header>
+                        <p class="mt-12 text-gray-400 text-sm">
+                            JPG, PNG or PDF only, maximum file size-5MB
+                        </p>
+                        <input type="file" class="file-input" hidden />
+                    </div>
+                </section>
+
+                <!-- Images groups - All the selected images will be shown here -->
+                <p class="text-red-700 text-sm hidden" id="filesize-error">
+                    The file size should be less than 5mb
+                </p>
+                <p class="text-red-700 text-sm hidden" id="filetype-error">
+                    The file should be an image or pdf only
+                </p>
+
+                <!-- No document selected -->
+                <p class="hidden text-xl text-red-600 text-center bg-pink-200 mt-6 p-3 rounded-lg" id="input-empty-error"></p>
+                <!-- Showing all the files inside this list -->
+                <ul id="document-images" class="mt-6 px-3 bg-slate-100"></ul>
+                <div id="saver">
+                    <button class="h-12 px-6 m-2 text-lg text-indigo-100 transition-colors duration-150 bg-blue-400 rounded-lg focus:shadow-outline hover:bg-blue-800" id="saveDB"> Guardar en Dropbox</button>
+                </div>
+                <hr>
+                <div id="container"></div>
+            </article>
+        </div>
+    </div>
+</section>
+<script>
+    var options = {
+        // Shared link to Dropbox file
+        link: "https://www.dropbox.com/scl/fo/xfk5xywnaj8xuls4o3d7j/h?rlkey=0c3xcmoreo5znt48xu8w4k0ql&dl=0",
+        file: {
+            // Sets the zoom mode for embedded files. Defaults to 'best'.
+            zoom: "best" // "best" or "fit"
+        },
+        folder: {
+            // Sets the view mode for embedded folders. Defaults to 'list'.
+            view: "list", // "grid" or "list"
+            headerSize: "small" // or "normal"
+        }
+    }
+    let element = document.getElementById('container');
+    Dropbox.embed(options, element);
+
+    //  -------
+    //selecting all required elements
+    const dropArea = document.querySelector(".drag-area"),
+        dragFile = dropArea.querySelector(".drag-file"),
+        button = dropArea.querySelector(".file-input-button"),
+        input = dropArea.querySelector(".file-input");
+
+    let documentImages = document.querySelector("#document-images");
+
+    /*
+     * When the user clicks the previous button, the current section is hidden and the previous section is
+     * shown.
+     * @param sectionContainer - the section that is currently being displayed
+     */
+    /*const prevButtonNavigation = (sectionContainer) => {
+        sectionContainer.classList.add("hidden");
+        sectionContainer.previousElementSibling.classList.add("block");
+        sectionContainer.previousElementSibling.classList.remove("hidden");
+    };
+    */
+    /*
+     * When the next button is clicked, hide the current section and show the next section.
+     * @param sectionContainer - the section that is currently being displayed
+     */
+    /*const nextButtonNavigation = (sectionContainer) => {
+        sectionContainer.classList.add("hidden");
+        sectionContainer.nextElementSibling.classList.add("block");
+        sectionContainer.nextElementSibling.classList.remove("hidden");
+    };
+*/
+    // Files array to check whether there is any file
+    // selected or not
+    let documentFileObj = {
+        fileName: [],
+        filePath: [],
+    };
+
+
+    // Input validation to check whether the fileName
+    // array in documentFileObj has any file or not and
+    // throw the error accordingly
+    const validationInputs = (container, dataObject) => {
+        const errorMessage = container.querySelector("#input-empty-error");
+        const emptyFields = [];
+        for (const key in dataObject) {
+            if (dataObject[key].length <= 0) {
+                emptyFields.push(key.toUpperCase());
+            }
+        }
+        errorMessage.textContent = `Please fill ${emptyFields.join()} fields!!`;
+        errorMessage.classList.remove("hidden");
+        setTimeout(() => {
+            errorMessage.classList.add("hidden");
+        }, 2000);
+    };
+
+
+
+    button.onclick = () => {
+        input.click(); //if user click on the button then the input also gets clicked
+    };
+
+    input.addEventListener("change", function (e) {
+        const target = e.target;
+        setttingFileValue(target);
+    });
+
+    // Finding the document closest to the delete button and removing it from the list
+    documentImages.addEventListener("click", (e) => {
+        const target = e.target;
+        const deleteFileButton = target.closest(".delete-document");
+        const documentsWrapper = target.closest("#document-images");
+        const documentToDelete = target.closest(".document-file");
+        const documentName = documentToDelete.firstElementChild.children[1].innerText;
+
+        if (deleteFileButton === null) return;
+
+        /* This is finding the index of the file name in the documentFileObj object. */
+        const index = documentFileObj["fileName"].find((x) => x === documentName);
+        /* This is removing the file name from the documentFileObj object. */
+        documentFileObj["fileName"].splice(index, 1);
+        documentsWrapper.removeChild(documentToDelete);
+    });
+
+    /**
+     * If the file type is jpg, jpeg, or png, return the text-violet-600 fa-image class. Otherwise, return
+     * the text-red-600 fa-file-pdf class.
+     * @param fileType - The file type of the file.
+     * @returns A function that takes a fileType as an argument and returns a string.
+     */
+    const fileTypeLogo = (fileType) => {
+        if (fileType === "jpg" || fileType === "jpeg" || fileType === "png") {
+            return "text-blue-600 fa-image";
+        } else {
+            return "text-red-600 fa-file-pdf";
+        }
+    };
+
+    // //If user Drag File Over DropArea
+    /* This is an event listener. It is listening for the dragover event. When the dragover event is
+    triggered, it will prevent the default behavior, add the active class to the dropArea element, and
+    change the text of the dragFile element. */
+    dropArea.addEventListener("dragover", (event) => {
+        event.preventDefault(); //preventing from default behaviour
+        dropArea.classList.add("active");
+        dragFile.textContent = "Release to Upload File";
+    });
+
+    // //If user leave dragged File from DropArea
+    /* This is an event listener. It is listening for the dragleave event. When the dragleave event is
+    triggered, it will remove the active class from the dropArea element and change the text of the
+    dragFile
+    element. */
+    dropArea.addEventListener("dragleave", () => {
+        dropArea.classList.remove("active");
+        dragFile.textContent = "Drag files here to upload";
+    });
+
+    //If user drop File on DropArea
+    /* This is an event listener. It is listening for the drop event. When the drop event is triggered, it
+    will prevent the default behavior, remove the active class from the dropArea element, change the
+    text of the dragFile element, and call the setttingFileValue function. */
+    dropArea.addEventListener("drop", (e) => {
+        e.preventDefault();
+        const target = e.dataTransfer;
+        dropArea.classList.remove("active");
+        dragFile.textContent = "Drag files here to upload";
+        setttingFileValue(target);
+    });
+
+    // Navigation part
+    /* This is an event listener. It is listening for the click event. When the click event is triggered,
+    it will check if the target is the nextButton or prevButton. If it is the nextButton, it will check
+    if the documentFileObj object has a fileName property. If it does, it will call the
+    nextButtonNavigation function. If it does not, it will show an alert. If the target is the
+    prevButton, it will call the prevButtonNavigation function. */
+    /*document.querySelector("body").addEventListener("click", (e) => {
+        const target = e.target;
+        const prevButton = target.closest(".document-prev-button");
+        const nextButton = target.closest(".document-next-button");
+        const sectionContainer = target.closest(".section-container");
+
+        if (nextButton) {
+            if (documentFileObj["fileName"].length !== 0) {
+                nextButtonNavigation(sectionContainer);
+            } else {
+                validationInputs(sectionContainer, documentFileObj);
+            }
+        }
+
+        if (prevButton) {
+            prevButtonNavigation(sectionContainer);
+        }
+    });*/
+
+    const setttingFileValue = (target) => {
+        /*getting user select file and [0] this means if user select multiple files then we'll select only the first one
+           This is getting the file name, file size, and file type. */
+        const fileName = target.files[0].name;
+        const fileSize = target.files[0].size;
+        const fileType = target.files[0].type.split("/").pop(); //fetching only the part after slash
+        const filePath = URL.createObjectURL(target.files[0]);
+        let filesizeErrorMessage = document.getElementById("filesize-error");
+        let filetypeErrorMessage = document.getElementById("filetype-error");
+        console.log(target.files[0]);
+        /* This is checking the file size. If the file size is greater than 5mb, it will show an error
+          message. */
+        let sizeInMB = Number.parseFloat(fileSize / (1024 * 1024)).toFixed(2);
+        if (sizeInMB > 5) {
+            filesizeErrorMessage.classList.remove("hidden");
+            filetypeErrorMessage.classList.add("hidden");
+        } else {
+            filesizeErrorMessage.classList.add("hidden");
+            /* This is checking the file type. If the file type is not pdf or image, it will show an error message. */
+            const fileTypes = ["application/pdf","image/png","image/jpg","image/jpeg"]
+            if (
+                fileTypes.includes(target.files[0].type)
+            ) {
+                filetypeErrorMessage.classList.add("hidden");
+
+                /* This is creating a new element and setting the file name, file size, and file type. */
+                let newDocument = document.createElement("li");
+
+                /* Setting the class attribute of the newDocument element. */
+                newDocument.setAttribute(
+                    "class",
+                    "py-3 flex justify-between items-center md:items-end text-xs md:text-sm text-slate-700 border-b-2 border-slate-100 gap-1 document-file"
+                );
+
+                /* Setting the html markup of the new element and setting the file name, file size, and file type. */
+                newDocument.innerHTML = `<p class="whitespace-nowrap overflow-hidden text-ellipsis w-40"><i class="fa-solid text-xl mr-5 ${fileTypeLogo(fileType)}"></i>
+                                        <span>${fileName}<span></p>
+                                        <p>${fileType}</p>
+                                        <p>${sizeInMB}mb</p>
+                                        <p>Uploaded</p>
+                                        <button class="delete-document"><i class="fa-solid fa-trash"></i></button>
+                                        `;
+                /* Adding the newDocument element to the documentImages element. */
+                documentImages.append(newDocument);
+                /* This is adding the file name to the documentFileObj object. */
+                documentFileObj["fileName"].push(fileName);
+                documentFileObj["filePath"].push(filePath);
+                console.log(documentFileObj);
+            } else {
+                filetypeErrorMessage.classList.remove("hidden");
+            }
+        }
+    };
+
+    var optionsSave = {
+        files: [
+            // You can specify up to 100 files.
+            {'url': 'http://localhost/c2174089-decf-4bc5-b6d2-a7b4d2e31744', 'filename': 'energy.jpg'},
+            //{'url': '2.jpg', 'filename': '2.jpg'},
+           // {'url': '...', 'filename': '...'},
+            // ...
+        ],
+
+        // Success is called once all files have been successfully added to the user's
+        // Dropbox, although they may not have synced to the user's devices yet.
+        success: function () {
+            // Indicate to the user that the files have been saved.
+            alert("Success! Files saved to your Dropbox.");
+        },
+
+        // Progress is called periodically to update the application on the progress
+        // of the user's downloads. The value passed to this callback is a float
+        // between 0 and 1. The progress callback is guaranteed to be called at least
+        // once with the value 1.
+        progress: function (progress) {},
+
+        // Cancel is called if the user presses the Cancel button or closes the Saver.
+        cancel: function () {},
+
+        // Error is called in the event of an unexpected response from the server
+        // hosting the files, such as not being able to find a file. This callback is
+        // also called if there is an error on Dropbox or if the user is over quota.
+        error: function (errorMessage) {}
+    };
+    //var buttonSaver = Dropbox.createSaveButton(optionsSave);
+    //document.getElementById("saver").appendChild(buttonSaver);
+    document.getElementById("saveDB").addEventListener("click", () => {
+        Dropbox.save(optionsSave);
+    });
+    //
+</script>
+</body>
+</html>

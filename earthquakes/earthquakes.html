@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Earthquakes Map</title>
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+    <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
+    <style>
+        h1,h2 {
+            text-align: center;
+        }
+        article {
+            min-width: 800px;
+        }
+    </style>
+</head>
+<body>
+<h1>GeoRSS Sismología IGN</h1>
+<article>Este canal te permite consultar los terremotos ocurridos en España durante los últimos diez días. Esta información está sujeta a modificaciones como
+    consecuencia de la continua revisión del análisis sísmico.</article>
+<div id="mapid" style="width: 800px; height: 600px;"></div>
+<article id="list"></article>
+<script>
+    var myIcon = L.icon({
+        iconUrl: 'earthquake.gif',
+        iconSize: [38, 38]
+    });
+
+    var osmLayer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    });
+
+    var map = L.map('mapid').setView([36.7305, -6.5356], 6).addLayer(osmLayer);
+
+    $(document).ready( () => {
+        var earthquakes = async function () {
+            var result;
+            await $.ajax({
+                'type': 'post',
+                'url':'./earthquakes.php',
+                'success': function (data) {
+                    result = JSON.parse(data);
+                }
+            });
+            return result;
+        }();
+
+        earthquakes.then(function (data){
+            let list = document.getElementById("list");
+            for (i=0; i < data.length; i++) {
+                console.log(data[i].location);
+                var point = [data[i].lat,data[i].long];
+                var popUp = "<a href='"+data[i].link+"' target='_blank'><b>" + data[i].location +"</b></a></br> Coordenadas: " + point +"<br>Magnitud:<b> " + data[i].magnitude +"</b>";
+                L.marker(point,{icon: myIcon}).addTo(map).bindPopup(popUp);
+                let details = document.createElement("details");
+                let summary = document.createElement("summary");
+                let content = document.createElement("p");
+                let link = document.createElement("a");
+                let att = document.createAttribute("href");
+                att.value = data[i].link;
+                link.setAttributeNode(att);
+                link.className = "button";
+                link.textContent = "+ info";
+                content.textContent = data[i].description;
+                summary.textContent = data[i].location + ". " + data[i].date + " " + data[i].time ;
+                details.appendChild(summary);
+                details.appendChild(content);
+                details.appendChild(link);
+                list.appendChild(details);
+            }
+        });
+
+    });
+
+</script>
+</body>
+</html>

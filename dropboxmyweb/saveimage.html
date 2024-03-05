@@ -1,0 +1,185 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dropbox Pre-built components</title>
+    <!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">-->
+    <script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="API_KEY_DROPBOX"></script>
+    <script rel="preconnect" src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.css" rel="stylesheet" />
+    <!-- font awesome -->
+    <script src="https://kit.fontawesome.com/ffbd6d2f88.js" crossorigin="anonymous"  defer></script>
+    <style>
+        #container {
+            height: 800px;
+        }
+
+        #saver, #chooser-demo {
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+<section class="section">
+    <div class="container mx-auto">
+        <h1 class="text-4xl text-teal-400 py-8 font-semibold">Dropbox Pre-built components</h1>
+        <div class="box-border shadow-md p-4">
+            <article>
+                <h2 class="text-3xl text-blue-400 px-2 font-semibold"><a href="https://www.dropbox.com/developers/embedder">Upload files to DropBox</a></h2>
+                <p class="text-xl p-3">The Upload options allows you to use save file into Dropbox previews view of Dropbox files
+                    or folders inside your web app.</p>
+             <!-- Documents uploads form and instructions -->
+                <div id="chooser-demo">
+                    <button class="h-12 px-6 m-2 text-lg text-indigo-100 transition-colors duration-150 bg-blue-400 rounded-lg focus:shadow-outline hover:bg-blue-800" id="chooser"> Mostrar carpeta</button>
+                </div>
+                <hr><br>
+                <div id="custom-controls-gallery" class="relative w-full" data-carousel="slide">
+                    <!-- Carousel wrapper -->
+                    <div id="carrousel" class="relative h-56 overflow-hidden rounded-lg md:h-96">
+                    </div>
+                    <div class="flex justify-center items-center pt-4">
+                        <button type="button" class="flex justify-center items-center me-4 h-full cursor-pointer group focus:outline-none" data-carousel-prev>
+                            <span class="text-gray-400 hover:text-gray-900 dark:hover:text-white group-focus:text-gray-900 dark:group-focus:text-white">
+                                <svg class="rtl:rotate-180 w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5H1m0 0 4 4M1 5l4-4"/>
+                                </svg>
+                                <span class="sr-only">Previous</span>
+                            </span>
+                        </button>
+                        <button type="button" class="flex justify-center items-center h-full cursor-pointer group focus:outline-none" data-carousel-next>
+                            <span class="text-gray-400 hover:text-gray-900 dark:hover:text-white group-focus:text-gray-900 dark:group-focus:text-white">
+                                <svg class="rtl:rotate-180 w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+                                </svg>
+                                <span class="sr-only">Next</span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="saver">
+                    <button class="h-12 px-6 m-2 text-lg text-indigo-100 transition-colors duration-150 bg-blue-400 rounded-lg focus:shadow-outline hover:bg-blue-800" id="saveDB"> Guardar en Dropbox</button>
+                </div>
+                <hr>
+                <div id="container"></div>
+            </article>
+        </div>
+    </div>
+</section>
+<script>
+    var MAX_NUM_IMAGES = 6;
+
+    var text = "";
+    var fileData = [];
+    for (let i=1;i<=MAX_NUM_IMAGES;i++) {
+        let route = "https://flowbite.s3.amazonaws.com/docs/gallery/square/image-"+i+".jpg";
+        text+='<div class="hidden duration-700 ease-in-out " data-carousel-item>';
+        text+='<img src="'+route+'" class="absolute block max-w-full h-auto -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2" alt="'+i+'">';
+        text+='</div>';
+        fileData.push({"url" : route, "filename": i+'.jpg'})
+    }
+    console.log(fileData);
+    console.log(text);
+    document.getElementById("carrousel").innerHTML=text;
+
+    let element = document.getElementById('container');
+    let link = "";
+    let optionsList = [];
+    let embed;
+
+    optionsChoose = {
+        // Required. Called when a user selects an item in the Chooser.
+        success: function(files) {
+            link = files[0].link;
+             optionsList = {
+                // Shared link to Dropbox file
+                link: link,
+                file: {
+                    // Sets the zoom mode for embedded files. Defaults to 'best'.
+                    zoom: "best" // "best" or "fit"
+                },
+                folder: {
+                    // Sets the view mode for embedded folders. Defaults to 'list'.
+                    view: "list", // "grid" or "list"
+                    headerSize: "small" // or "normal"
+                }
+            }
+            embed = Dropbox.embed(optionsList, element);
+        },
+
+        // Optional. Called when the user closes the dialog without selecting a file
+        // and does not include any parameters.
+        cancel: function() {
+            alert("Canceled")
+        },
+
+        // Optional. "preview" (default) is a preview link to the document for sharing,
+        // "direct" is an expiring link to download the contents of the file. For more
+        // information about link types, see Link types below.
+        linkType: "preview", // or "direct"
+
+        // Optional. A value of false (default) limits selection to a single file, while
+        // true enables multiple file selection.
+        multiselect: false, // or true
+
+        // Optional. This is a list of file extensions. If specified, the user will
+        // only be able to select files with these extensions. You may also specify
+        // file types, such as "video" or "images" in the list. For more information,
+        // see File types below. By default, all extensions are allowed.
+        extensions: ['.pdf', '.doc', '.docx', '.png'],
+
+        // Optional. A value of false (default) limits selection to files,
+        // while true allows the user to select both folders and files.
+        // You cannot specify `linkType: "direct"` when using `folderselect: true`.
+        folderselect: true, // or true
+
+        // Optional. A limit on the size of each file that may be selected, in bytes.
+        // If specified, the user will only be able to select files with size
+        // less than or equal to this limit.
+        // For the purposes of this option, folders have size zero.
+        //sizeLimit: 1024, // or any positive number
+    };
+
+    var optionsSave = {
+        files: fileData,
+
+        // Success is called once all files have been successfully added to the user's
+        // Dropbox, although they may not have synced to the user's devices yet.
+        success: function () {
+            // Indicate to the user that the files have been saved.
+            alert("Success! Files saved to your Dropbox.");
+            Dropbox.unmount(embed);
+            if ( link !== '' ) Dropbox.embed(optionsList, element);
+        },
+
+        // Progress is called periodically to update the application on the progress
+        // of the user's downloads. The value passed to this callback is a float
+        // between 0 and 1. The progress callback is guaranteed to be called at least
+        // once with the value 1.
+        progress: function (progress) {},
+
+        // Cancel is called if the user presses the Cancel button or closes the Saver.
+        cancel: function () {},
+
+        // Error is called in the event of an unexpected response from the server
+        // hosting the files, such as not being able to find a file. This callback is
+        // also called if there is an error on Dropbox or if the user is over quota.
+        error: function (errorMessage) {}
+    };
+
+    document.getElementById("chooser").addEventListener("click", () => {
+        Dropbox.choose(optionsChoose);
+    });
+
+    //var buttonSaver = Dropbox.createSaveButton(optionsSave);
+    //document.getElementById("saver").appendChild(buttonSaver);
+    document.getElementById("saveDB").addEventListener("click", () => {
+        console.log(optionsSave.files);
+        Dropbox.save(optionsSave);
+    });
+    //
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+</body>
+</html>

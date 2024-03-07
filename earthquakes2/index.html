@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Earthquakes Map</title>
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.2/moment.min.js"></script>
+    <script src="https://cdn.datatables.net/2.0.2/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/colreorder/2.0.0/js/dataTables.colReorder.js"></script>
+    <script src="https://cdn.datatables.net/colreorder/2.0.0/js/colReorder.dataTables.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <link rel="stylesheet" href="https://cdn.simplecss.org/simple.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.2/css/dataTables.dataTables.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/colreorder/2.0.0/css/colReorder.dataTables.css">
+    <style>
+        body {
+            font: 90%/1.5em system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue","Noto Sans","Liberation Sans",Arial,sans-serif !important;
+            display: grid;
+            grid-template-columns: 1fr min(65rem, 90%) 1fr;
+        }
+        h1,h2 {
+            text-align: center;
+        }
+        article {
+            min-width: 800px;
+        }
+        label {
+            display: inline;
+        }
+
+        select:not([multiple]) {
+            background-image: none;
+            padding-inline-end: 25px;
+        }
+    </style>
+</head>
+<body>
+<h1>GeoRSS Sismología IGN</h1>
+<article>Este canal te permite consultar los terremotos ocurridos en España durante los últimos diez días. Esta información está sujeta a modificaciones como
+    consecuencia de la continua revisión del análisis sísmico.</article>
+<div id="mapid" style="width: 1040px; height: 600px;"></div>
+<table id="datalist" class="display" style="width:100%">
+    <thead>
+    <tr>
+        <th></th>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Location</th>
+        <th>Magnitude</th>
+        <th>latitude</th>
+        <th>Longitude</th>
+    </tr>
+    </thead>
+    <tfoot>
+    <tr>
+        <th></th>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Location</th>
+        <th>Magnitude</th>
+        <th>latitude</th>
+        <th>Longitude</th>
+    </tr>
+    </tfoot>
+</table>
+<script>
+    var myIcon = L.icon({
+        iconUrl: 'earthquake.gif',
+        iconSize: [38, 38]
+    });
+
+    var osmLayer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© <a href="http://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    });
+
+    var map = L.map('mapid').setView([36.7305, -6.5356], 6).addLayer(osmLayer);
+
+    $(document).ready( () => {
+        var earthquakes = async function () {
+            var result;
+            await $.ajax({
+                'type': 'post',
+                'url':'./earthquakes.php',
+                'success': function (data) {
+                    result = JSON.parse(data);
+                }
+            });
+            return result;
+        }();
+
+        earthquakes.then(function (data){
+            let list = document.getElementById("list");
+            for (i=0; i < data.length; i++) {
+                console.log(data[i].location);
+                var point = [data[i].lat,data[i].long];
+                var popUp = "<a href='"+data[i].link+"' target='_blank'><b>" + data[i].location +"</b></a></br> Coordenadas: " + point +"<br>Magnitud:<b> " + data[i].magnitude +"</b>";
+                L.marker(point,{icon: myIcon}).addTo(map).bindPopup(popUp);
+
+            }
+        });
+
+        // Formatting function for row details - modify as you need
+        function format(d) {
+            // `d` is the original data object for the row
+            return (
+                '<dl>' +
+                '<dd>' +
+                d.description +
+                '</dd>' +
+                '<dd>' +
+                '<a href="'+d.link+'" target="_blank"> \+ info </a>' +
+                '</dd>' +
+                '</dl>'
+            );
+        }
+
+        let table = new DataTable('#datalist', {
+            ajax: {
+                url: 'earthquakes.php',
+                dataSrc: '',
+            }, columns: [
+                {
+                    className: 'dt-control',
+                    orderable: false,
+                    data: null,
+                    defaultContent: ''
+                },
+                {data: 'date'},
+                {data: 'time'},
+                {data: 'location'},
+                {data: 'magnitude'},
+                {data: 'lat'},
+                {data: 'long'}
+            ],
+            order: [[1, 'asc']],
+            colReorder: {
+                columns: ':not(:first-child)'
+            }
+
+        });
+
+        // Add event listener for opening and closing details
+        table.on('click', 'td.dt-control', function (e) {
+            let tr = e.target.closest('tr');
+            let row = table.row(tr);
+
+            if (row.child.isShown()) {
+                // This row is already open - close it
+                row.child.hide();
+            }
+            else {
+                // Open this row
+                row.child(format(row.data())).show();
+            }
+        });
+    });
+
+</script>
+</body>
+</html>
